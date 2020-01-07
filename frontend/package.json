@@ -1,0 +1,55 @@
+{
+  "name": "streamlabs-github-sponsors-alerts",
+  "private": true,
+  "description": "Trigger subscription alerts when someone sponsors you on GitHub",
+  "version": "1.0.0",
+  "author": "Mathieu Dutour",
+  "dependencies": {
+    "@emotion/core": "^10.0.27",
+    "@emotion/styled": "^10.0.27",
+    "gatsby": "^2.18.18",
+    "gatsby-image": "^2.2.37",
+    "gatsby-plugin-emotion": "^4.1.18",
+    "gatsby-plugin-manifest": "^2.2.34",
+    "gatsby-plugin-netlify": "^2.1.30",
+    "gatsby-plugin-react-helmet": "^3.1.18",
+    "gatsby-plugin-sharp": "^2.3.10",
+    "gatsby-plugin-sitemap": "^2.2.24",
+    "gatsby-plugin-typescript": "^2.1.23",
+    "gatsby-source-filesystem": "^2.1.43",
+    "gatsby-transformer-sharp": "^2.3.9",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "react-helmet": "^5.2.1"
+  },
+  "keywords": [
+    "streamlabs",
+    "twitch",
+    "streaming",
+    "alerts",
+    "github sponsors",
+    "subscriptions"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "gatsby build",
+    "develop": "gatsby develop",
+    "start": "npm run develop",
+    "clean": "gatsby clean",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/react-helmet": "^5.0.15",
+    "prettier": "^1.19.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathieudutour/streamlabs-github-sponsors-alerts"
+  },
+  "prettier": {
+    "proseWrap": "never",
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "semi": false
+  }
+}

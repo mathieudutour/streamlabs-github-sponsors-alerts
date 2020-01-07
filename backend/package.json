@@ -1,0 +1,39 @@
+{
+  "name": "streamlabs-github-sponsors-alerts-backend",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "lint": "find . -name \"*.ts\" | grep -v -f .gitignore | xargs eslint",
+    "prettier:base": "prettier --write",
+    "prettify": "find . -name \"*.ts\" | grep -v -f .gitignore | xargs npm run prettier:base",
+    "deploy:dev": "serverless deploy -s dev",
+    "deploy:prod": "serverless deploy -s production",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.0",
+    "randomstring": "^1.1.5"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.39",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/node": "^13.1.4",
+    "@types/node-fetch": "^2.5.4",
+    "@types/randomstring": "^1.1.6",
+    "aws-sdk": "^2.598.0",
+    "prettier": "^1.19.1",
+    "serverless-webpack": "^5.3.1",
+    "source-map-support": "^0.5.16",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.4",
+    "webpack": "^4.41.5"
+  },
+  "prettier": {
+    "proseWrap": "never",
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "semi": false
+  }
+}

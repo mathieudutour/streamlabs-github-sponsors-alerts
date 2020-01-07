@@ -1,0 +1,102 @@
+service:
+  name: streamlabs-github-sponsors
+
+custom:
+  usersTableName: streamlabs-github-users-${self:provider.stage}
+
+plugins:
+  - serverless-webpack
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'dev'}
+  environment:
+    BASE_API_URL:
+      'Fn::Join':
+        - ''
+        - - 'https://'
+          - { 'Ref': 'ApiGatewayRestApi' }
+          - '.execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}'
+    ENV: ${self:provider.stage}
+    USERS_TABLE_NAME: ${self:custom.usersTableName}
+    STREAMLABS_CLIENT_ID: ${file(./config.${self:provider.stage}.yml):STREAMLABS_CLIENT_ID}
+    STREAMLABS_CLIENT_SECRET: ${file(./config.${self:provider.stage}.yml):STREAMLABS_CLIENT_SECRET}
+  iamRoleStatements:
+    - Effect: 'Allow'
+      Action:
+        - 'dynamodb:*'
+      Resource:
+        - arn:aws:dynamodb:*:*:table/${self:custom.usersTableName}
+        - arn:aws:dynamodb:*:*:table/${self:custom.usersTableName}/*
+
+functions:
+  streamlabsOauth:
+    handler: lib/oauth/streamlabs.handler
+    events:
+      - http:
+          method: get
+          path: oauth/streamlabs
+          cors: true
+  me:
+    handler: lib/rest.me
+    events:
+      - http:
+          method: get
+          path: me
+          cors: true
+  updateMe:
+    handler: lib/rest.updateMe
+    events:
+      - http:
+          method: put
+          path: me
+          cors: true
+  githubWebhook:
+    handler: lib/webhook/github.handler
+    events:
+      - http:
+          method: post
+          path: webhook/github/{userId}
+          cors: true
+
+resources:
+  Resources:
+    UsersDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: token
+            AttributeType: S
+          - AttributeName: streamlabsId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: streamlabsIdIndex
+            KeySchema:
+              - AttributeName: streamlabsId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+          - IndexName: tokenIndex
+            KeySchema:
+              - AttributeName: token
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.usersTableName}
