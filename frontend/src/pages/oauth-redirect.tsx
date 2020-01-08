@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { graphql } from 'gatsby'
-import Img from 'gatsby-image'
 import styled from '@emotion/styled'
 
 import Layout from '../components/layout'
 import SEO from '../components/seo'
+import Footer from '../components/footer'
 
 type User = {
   id: string
@@ -22,8 +21,10 @@ type User = {
 const Wrapper = styled.div`
   width: 800px;
   max-width: 100%;
+  min-height: 100vh;
   padding: 3em 15px;
   margin: 0 auto;
+  position: relative;
 `
 
 const Data = styled.span`
@@ -100,6 +101,7 @@ const OauthRedirectPage = ({ location }: { location: Location }) => {
             alert on streamlabs.
           </li>
         </ol>
+        <Footer />
       </Wrapper>
     </Layout>
   )

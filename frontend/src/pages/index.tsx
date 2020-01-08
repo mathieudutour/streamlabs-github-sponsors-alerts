@@ -3,13 +3,16 @@ import styled from '@emotion/styled'
 
 import Layout from '../components/layout'
 import SEO from '../components/seo'
+import Footer from '../components/footer'
 
 const Wrapper = styled.div`
   text-align: center;
   width: 500px;
   max-width: 100%;
+  min-height: 100vh;
   padding: 3em 15px;
   margin: 0 auto;
+  position: relative;
 `
 
 const ImageWrapper = styled.div`
@@ -47,6 +50,7 @@ const IndexPage = () => {
         >
           Log in with streamlabs
         </LoginButton>
+        <Footer />
       </Wrapper>
     </Layout>
   )
