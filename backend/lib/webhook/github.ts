@@ -1,15 +1,9 @@
 import crypto from 'crypto'
 import * as qs from 'querystring'
 import fetch from 'node-fetch'
-import {
-  _handler
-} from '../_handler'
-import {
-  BadRequest
-} from '../errors'
-import {
-  findUser
-} from '../storage'
+import { _handler } from '../_handler'
+import { BadRequest } from '../errors'
+import { findUser } from '../storage'
 
 function signRequestBody(key: string, body: string) {
   return `sha1=${crypto
@@ -21,7 +15,10 @@ function signRequestBody(key: string, body: string) {
 function replaceTemplate(string: string, payload: WebhookPayloadSponsorship) {
   return string
     .replace(/GITHUB_USERNAME/g, payload.sponsorship.sponsor.login)
-    .replace(/TIER_PRICE/g, payload.sponsorship.tier.monthly_price_in_dollars.toString())
+    .replace(
+      /TIER_PRICE/g,
+      payload.sponsorship.tier.monthly_price_in_dollars.toString()
+    )
 }
 
 type GitHubUser = {
@@ -64,40 +61,41 @@ type WebhookPayloadSponsorship = {
     tier: Tier
   }
   sender: GitHubUser
-} & ( |
-  {
-    action: 'created'
-  } |
-  {
-    action: 'edited'
-    changes: {
-      privacy_level: 'public' | 'private'
+} & (
+  | {
+      action: 'created'
     }
-  } |
-  {
-    action: 'tier_changed' // upgrade
-    changes: {
-      tier: {
-        from: Tier
+  | {
+      action: 'edited'
+      changes: {
+        privacy_level: 'public' | 'private'
       }
     }
-  } |
-  {
-    action: 'pending_tier_change' // downgrade
-    changes: {
-      tier: {
-        from: Tier
+  | {
+      action: 'tier_changed' // upgrade
+      changes: {
+        tier: {
+          from: Tier
+        }
       }
     }
-    effective_date: string
-  } |
-  {
-    action: 'pending_cancellation'
-    effective_date: string
-  } |
-  {
-    action: 'cancelled'
-  })
+  | {
+      action: 'pending_tier_change' // downgrade
+      changes: {
+        tier: {
+          from: Tier
+        }
+      }
+      effective_date: string
+    }
+  | {
+      action: 'pending_cancellation'
+      effective_date: string
+    }
+  | {
+      action: 'cancelled'
+    }
+)
 
 export const handler = _handler(async event => {
   const userId = event.pathParameters.userId
@@ -151,10 +149,13 @@ export const handler = _handler(async event => {
       const payload = body as WebhookPayloadSponsorship
 
       if (payload.action === 'created' || payload.action === 'tier_changed') {
-        const data: {[key: string]: string} = {
+        const data: { [key: string]: string } = {
           access_token: user.streamlabsToken,
           type: 'subscription',
-          message: replaceTemplate(user.message || '*GITHUB_USERNAME* just sponsored!', payload)
+          message: replaceTemplate(
+            user.message || '*GITHUB_USERNAME* just sponsored!',
+            payload
+          ),
         }
 
         if (user.image_href) {
@@ -181,14 +182,17 @@ export const handler = _handler(async event => {
           data.user_message = replaceTemplate(user.user_message, payload)
         }
 
-        await fetch(`https://streamlabs.com/api/v1.0/alerts`, {
+        const res = await fetch(`https://streamlabs.com/api/v1.0/alerts`, {
           method: 'POST',
           headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
           },
           body: qs.stringify(data),
         })
+
+        if (!res.ok) {
+          console.error(await res.text())
+        }
       }
 
       return { message: 'pong' }
